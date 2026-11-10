@@ -1,4 +1,5 @@
 # Import necessary packages (Make sure to also include in "requirements.txt" in this repository.)
+import streamlit as st
 import yfinance as yf
 import pandas as pd
 
