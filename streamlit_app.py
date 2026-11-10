@@ -1,27 +1,28 @@
 # Import necessary packages (Make sure to also include in "requirements.txt" in this repository.)
 import streamlit as st
+import yfinance as yf
 import pandas as pd
 
-# Print Title for the App
-st.title("Microsoft Stock Data Dashboard by Peter Wysocki")
+# Define the ticker and risk-free rate
+ticker = 'MSFT'
+rf_monthly = 0.0025  # 0.25% per month
 
-# Read CSV file with stock data (CSV file must be in 'main' folder for your assignment 4 repository) 
-df = pd.read_csv("msft.csv")
+# Download monthly stock price data for the past 5 years
+data = yf.download(ticker, period='5y', interval='1mo')
+close_prices = data['Close'][ticker]
 
-# Set up the 3 tabs on the Dashboard
-tabs = st.tabs(["📋 Raw Data", "📈 Price Chart", "📊 Volume Chart"])
+# Calculate monthly returns
+monthly_returns = close_prices.pct_change().dropna()
 
-# Tab 1: Raw Data
-with tabs[0]:
-    st.subheader(f"Raw Data for MSFT")
-    st.dataframe(df, use_container_width=True)
+# Calculate average excess return and standard deviation of returns
+excess_returns = monthly_returns - rf_monthly
+mean_excess_return = excess_returns.mean()
+std_dev_return = monthly_returns.std()
 
-# Tab 2: Closing Price Chart
-with tabs[1]:
-    st.subheader(f"Closing Price for MSFT")
-    st.line_chart(df['Close'])
+# Calculate the Monthly Sharpe Ratio
+monthly_sharpe_ratio = mean_excess_return / std_dev_return
 
-# Tab 3: Volume Chart
-with tabs[2]:
-    st.subheader(f"Volume for MSFT")
-    st.bar_chart(df['Volume'])
+print()
+print()
+print(f"Ticker: {ticker}")
+print(f"Monthly Sharpe Ratio: {monthly_sharpe_ratio:.3f}")
